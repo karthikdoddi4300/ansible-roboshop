@@ -6,10 +6,13 @@
     ami_id: ami-0220d79f3f480ecf5
     domain_name : hodophile.online
     env: dev 
+    action: create
     instances:
       - mongodb
       - catalogue
   tasks:
+
+   ####CREATE EC2 INSTANCES###
       - name: create an aws ec2 instance
         amazon.aws.ec2_instance:
           name: "{{item}}-{{env}}"
@@ -24,6 +27,7 @@
         
         loop: "{{instances}}"
         register: ec2_output 
+        when: action == "create"
 
       - name : print the  output 
         ansible.builtin.debug:
@@ -51,4 +55,29 @@
           value: "{{item.instances[0].public_ip_address}}"
           wait: true
         loop: "{{ec2_output.results}}"
-        when : item.item == "frontend" 
+        when : item.item == "frontend"
+
+
+
+
+###    destroying ec2
+
+
+
+      - name: delete r53 records
+        amazon.aws.route53:
+          state: absent
+          zone: "{{ domain_name }}"
+          record: "{{ item }}-{{ env }}.{{ domain_name }}" # roboshop-dev.daws88s.online
+          type: A
+          ttl: 1
+        loop: "{{ instances }}"
+        when: action == "destroy"
+
+      - name: delete ec2 instance
+        amazon.aws.ec2_instance:
+          state: absent
+          name: "{{ item }}-{{ env }}"
+          wait: false
+        loop: "{{ instances }}"
+        when: action == "destroy"
