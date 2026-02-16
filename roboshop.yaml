@@ -1,83 +1,86 @@
-- name : roboshop
+- name: roboshop
   hosts: all
   connection: local
+
   vars:
     sg_id: sg-0d9028f369846db6c
     ami_id: ami-0220d79f3f480ecf5
-    domain_name : hodophile.online
-    env: dev 
+    domain_name: hodophile.online
+    env: dev
     action: create
     instances:
       - mongodb
       - catalogue
+
   tasks:
 
-   ####CREATE EC2 INSTANCES###
-      - name: create an aws ec2 instance
-        amazon.aws.ec2_instance:
-          name: "{{item}}-{{env}}"
-          instance_type: "t3.micro"
-          security_group: "{{ sg_id }}"
-          image_id: "{{ ami_id }}"
-          tags:
-            Project: roboshop
-            Component: "{{ item }}"
-            env: "{{ env }}"
-            Name: "{{ item }}-{{ env }}"
-        
-        loop: "{{instances}}"
-        register: ec2_output 
-        when: action == "create"
+    ######################################################################
+    # CREATE EC2 INSTANCES 
+    ######################################################################
+    - name: Create AWS EC2 instances
+      amazon.aws.ec2_instance:
+        name: "{{ item }}-{{ env }}"
+        instance_type: t3.micro
+        security_group: "{{ sg_id }}"
+        image_id: "{{ ami_id }}"
+        tags:
+          Project: roboshop
+          Component: "{{ item }}"
+          env: "{{ env }}"
+          Name: "{{ item }}-{{ env }}"
+      loop: "{{ instances }}"
+      register: ec2_output
+      when: action == "create"
 
-      - name : print the  output 
-        ansible.builtin.debug:
-          msg: " {{ ec2_output }}"
+    - name: Print EC2 output
+      ansible.builtin.debug:
+        var: ec2_output
+      when: action == "create"
 
+    ######################################################################
+    # CREATE ROUTE53 RECORDS
+    ######################################################################
+    - name: Create Route53 A record for private IP
+      amazon.aws.route53:
+        state: present
+        zone: "{{ domain_name }}"
+        record: "{{ item.item }}-{{ env }}.{{ domain_name }}"
+        type: A
+        ttl: 1
+        value: "{{ item.instances[0].private_ip_address | trim }}"
+        wait: true
+      loop: "{{ ec2_output.results }}"
+      when: action == "create"
 
-      - name: creating aws route 53
-        amazon.aws.route53:
-          state: present
-          zone: "{{domain_name}}"
-          record: "{{ item.item }}-{{env}}.{{domain_name}}" # mangodb-dev.hodophile.online
-          type: A
-          ttl: 1
-          value: "{{item.instances[0].private_ip_address | trim }}"
-          wait: true
-        loop: "{{ec2_output.results}}"
+    - name: Create Route53 record for frontend PUBLIC IP
+      amazon.aws.route53:
+        state: present
+        zone: "{{ domain_name }}"
+        record: "roboshop-{{ env }}.{{ domain_name }}"
+        type: A
+        ttl: 1
+        value: "{{ item.instances[0].public_ip_address }}"
+        wait: true
+      loop: "{{ ec2_output.results }}"
+      when: action == "create" and item.item == "frontend"
 
-      - name: creating aws route 53
-        amazon.aws.route53:
-          state: present
-          zone: "{{domain_name}}"
-          record: "roboshop-{{env}}.{{domain_name}}" # roboshop-dev.hodophile.online
-          type: A
-          ttl: 1
-          value: "{{item.instances[0].public_ip_address}}"
-          wait: true
-        loop: "{{ec2_output.results}}"
-        when : item.item == "frontend"
+    ######################################################################
+    # DESTROY SECTION
+    ######################################################################
+    - name: Delete Route53 records
+      amazon.aws.route53:
+        state: absent
+        zone: "{{ domain_name }}"
+        record: "{{ item }}-{{ env }}.{{ domain_name }}"
+        type: A
+        ttl: 1
+      loop: "{{ instances }}"
+      when: action == "destroy"
 
-
-
-
-###    destroying ec2
-
-
-
-      - name: delete r53 records
-        amazon.aws.route53:
-          state: absent
-          zone: "{{ domain_name }}"
-          record: "{{ item }}-{{ env }}.{{ domain_name }}" # roboshop-dev.daws88s.online
-          type: A
-          ttl: 1
-        loop: "{{ instances }}"
-        when: action == "destroy"
-
-      - name: delete ec2 instance
-        amazon.aws.ec2_instance:
-          state: absent
-          name: "{{ item }}-{{ env }}"
-          wait: false
-        loop: "{{ instances }}"
-        when: action == "destroy"
+    - name: Delete EC2 instances
+      amazon.aws.ec2_instance:
+        state: absent
+        name: "{{ item }}-{{ env }}"
+        wait: false
+      loop: "{{ instances }}"
+      when: action == "destroy"
