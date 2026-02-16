@@ -1,0 +1,99 @@
+  {
+    "msg": {
+        "results": [
+            {
+                "changed": true,
+                "instance_ids": ["i-0f777f2c5c8cce535"],
+                "instances": [
+                    {
+                        "instance_id": "i-0f777f2c5c8cce535",
+                        "image_id": "ami-0220d79f3f480ecf5",
+                        "instance_type": "t3.micro",
+                        "state": { "code": 0, "name": "pending" },
+                        "private_ip_address": "172.31.6.82",
+                        "public_ip_address": "100.24.99.128",
+                        "root_device_name": "/dev/sda1",
+                        "root_device_type": "ebs",
+                        "security_groups": [
+                            { "group_id": "sg-0d9028f369846db6c", "group_name": "mySG01" }
+                        ],
+                        "block_device_mappings": [
+                            {
+                                "device_name": "/dev/sda1",
+                                "ebs": {
+                                    "volume_id": "vol-052566bbabd9585b9",
+                                    "status": "attaching",
+                                    "delete_on_termination": true
+                                }
+                            }
+                        ],
+                        "network_interfaces": [
+                            {
+                                "network_interface_id": "eni-01ad9c28fc5dea2bf",
+                                "private_ip_address": "172.31.6.82",
+                                "public_ip": "100.24.99.128",
+                                "subnet_id": "subnet-05ee00b7f503680bc",
+                                "vpc_id": "vpc-064e379ae4486cc45"
+                            }
+                        ],
+                        "tags": {
+                            "Name": "mongodb-dev",
+                            "Project": "roboshop",
+                            "env": "dev",
+                            "Component": "mongodb"
+                        }
+                    }
+                ],
+                "item": "mongodb"
+            },
+            {
+                "changed": true,
+                "instance_ids": ["i-0c591f525e817d540"],
+                "instances": [
+                    {
+                        "instance_id": "i-0c591f525e817d540",
+                        "image_id": "ami-0220d79f3f480ecf5",
+                        "instance_type": "t3.micro",
+                        "state": { "code": 0, "name": "pending" },
+                        "private_ip_address": "172.31.13.183",
+                        "public_ip_address": "3.236.152.73",
+                        "root_device_name": "/dev/sda1",
+                        "root_device_type": "ebs",
+                        "security_groups": [
+                            { "group_id": "sg-0d9028f369846db6c", "group_name": "mySG01" }
+                        ],
+                        "block_device_mappings": [
+                            {
+                                "device_name": "/dev/sda1",
+                                "ebs": {
+                                    "volume_id": "vol-05d5f086779670554",
+                                    "status": "attaching",
+                                    "delete_on_termination": true
+                                }
+                            }
+                        ],
+                        "network_interfaces": [
+                            {
+                                "network_interface_id": "eni-07a1c60ca5cd2cd50",
+                                "private_ip_address": "172.31.13.183",
+                                "public_ip": "3.236.152.73",
+                                "subnet_id": "subnet-05ee00b7f503680bc",
+                                "vpc_id": "vpc-064e379ae4486cc45"
+                            }
+                        ],
+                        "tags": {
+                            "Name": "catalogue-dev",
+                            "Project": "roboshop",
+                            "env": "dev",
+                            "Component": "catalogue"
+                        }
+                    }
+                ],
+                "item": "catalogue"
+            }
+        ],
+        "changed": true,
+        "skipped": false,
+        "msg": "All items completed"
+    }
+}
