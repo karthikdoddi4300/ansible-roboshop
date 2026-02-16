@@ -5,11 +5,12 @@
   - name: copying the mongo repo 
     ansible.builtin.copy:
       src: mongo.repo
-      dest: /etc/yum.repos.d/mongo.repo
+      dest: /etc/yum.repos.d/mongo.repo # /etc/yum.repos.d/mongo.repo
+
       
   - name: install mongodb server
     ansible.builtin.dnf:
-      name: mongodb-org
+      name: mongodb-org-7.0
       state: present
   
   # - name : starting  the mongodb server
