@@ -10,45 +10,45 @@
       - mongodb
       - catalogue
   tasks:
-  - name: create an aws ec2 instance
-    amazon.aws.ec2_instance:
-      name: "{{item}}-{{env}}"
-      instance_type: "t3.micro"
-      security_group: "{{ sg_id }}"
-      image_id: "{{ ami_id }}"
-      tags:
-        Project: roboshop
-        Component: "{{ item }}"
-        env: "{{ env }}"
-        Name: "{{ item }}-{{ env }}"
-    
-    loop: "{{instances}}"
-    register: ec2_output 
+      - name: create an aws ec2 instance
+        amazon.aws.ec2_instance:
+          name: "{{item}}-{{env}}"
+          instance_type: "t3.micro"
+          security_group: "{{ sg_id }}"
+          image_id: "{{ ami_id }}"
+          tags:
+            Project: roboshop
+            Component: "{{ item }}"
+            env: "{{ env }}"
+            Name: "{{ item }}-{{ env }}"
+        
+        loop: "{{instances}}"
+        register: ec2_output 
 
-  - name : print the  output 
-    ansible.builtin.debug:
-      msg: " {{ ec2_output }}"
+      - name : print the  output 
+        ansible.builtin.debug:
+          msg: " {{ ec2_output }}"
 
 
-  - name: creating aws route 53
-    amazon.aws.route53:
-      state: present
-      zone: "{{domain_name}}"
-      record: "{{ item.item }}-{{env}}.{{domain_name}}" # mangodb-dev.hodophile.online
-      type: A
-      ttl: 1
-      value: "{{item.instances[0].private_ip_address}}"
-      wait: true
-    loop: "{{ec2_output.results}}"
+      - name: creating aws route 53
+        amazon.aws.route53:
+          state: present
+          zone: "{{domain_name}}"
+          record: "{{ item.item }}-{{env}}.{{domain_name}}" # mangodb-dev.hodophile.online
+          type: A
+          ttl: 1
+          value: "{{item.instances[0].private_ip_address | trim }}"
+          wait: true
+        loop: "{{ec2_output.results}}"
 
-  - name: creating aws route 53
-    amazon.aws.route53:
-      state: present
-      zone: "{{domain_name}}"
-      record: "roboshop-{{env}}.{{domain_name}}" # roboshop-dev.hodophile.online
-      type: A
-      ttl: 1
-      value: "{{item.instances[0].public_ip_address}}"
-      wait: true
-    loop: "{{ec2_output.results}}"
-    when : item.item == "frontend" 
+      - name: creating aws route 53
+        amazon.aws.route53:
+          state: present
+          zone: "{{domain_name}}"
+          record: "roboshop-{{env}}.{{domain_name}}" # roboshop-dev.hodophile.online
+          type: A
+          ttl: 1
+          value: "{{item.instances[0].public_ip_address}}"
+          wait: true
+        loop: "{{ec2_output.results}}"
+        when : item.item == "frontend" 
