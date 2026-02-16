@@ -20,8 +20,9 @@
         Component: "{{ item }}"
         env: "{{ env }}"
         Name: "{{ item }}-{{ env }}"
-      register: ec2_output 
+    
     loop: "{{instances}}"
+    register: ec2_output 
 
   - name : print the  output 
     ansible.builtin.debug:
