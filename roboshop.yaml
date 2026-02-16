@@ -4,6 +4,7 @@
   vars:
     sg_id: sg-0d9028f369846db6c
     ami_id: ami-0220d79f3f480ecf5
+    domain_name : hodophile.online
     env: dev 
     instances:
       - mangodb
@@ -27,3 +28,15 @@
   - name : print the  output 
     ansible.builtin.debug:
       msg: " {{ ec2_output }}"
+
+
+  - name: creating aws route 53
+    amazon.aws.route53:
+      state: present
+      zone: "{{domain_name}}"
+      record: "{{ item.item }} - {{env}} - {{domain_name}} " # mangodb-dev.hodophile.online
+      type: A
+      ttl: 1
+      value: "{{item.instances[0].private_ip_address}}"
+      wait: true
+    loop: "{{ec2_output.results}}"
