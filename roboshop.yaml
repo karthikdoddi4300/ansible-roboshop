@@ -56,15 +56,14 @@
       amazon.aws.route53:
         state: present
         zone: "{{ domain_name }}"
-        record: "roboshop-{{ env }}.{{ domain_name }}"
-        type: A
+        record: "roboshop-{{ env }}.{{ domain_name }}"  # roboshop-dev.hodophile.online
+        type: A 
         ttl: 1
         value: "{{ item.instances[0].public_ip_address }}"
         wait: true
         overwite: true
       loop: "{{ ec2_output.results }}" #list 
-      when: action == "create" and item.item == "frontend"
-
+      when: item.item == "frontend" and action == "create" 
     
     # DESTROY SECTION
     
