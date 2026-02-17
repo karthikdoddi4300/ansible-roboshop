@@ -45,3 +45,30 @@
   #   ansible.builtin.unarchive:
   #     src : /tmp/catalogue.zip
   #     dest: /app 
+
+  - name: installing dependecies
+    community.general.npm:
+      path: /app
+  - name: copying catalogue service
+    ansible.builtin.copy:
+      src: catalogue.service
+      dest: /etc/systemd/system/catalogue.service
+
+  - name: copying mongo repo
+    ansible.builtin.copy:
+      src: mongo.repo
+      dest:  /etc/yum.repos.d/mongo.repo
+  
+  - name: installing the mongodb
+    ansible.builtin.dnf:
+      name: mongod-mongosh
+      state: present
+  
+  - name: check product is loaded
+    ansible.builtin.command: mongosh --host "{{ MONGODB_HOST }}" --quiet  --eval 'db.getMongo().getDBNames().indexOf("catalogue")'
+    register: catalogue_output
+  
+  - name : printing the output
+    ansible.builtin.debug:
+      mag: "{{catalogue_output}}"
+   
