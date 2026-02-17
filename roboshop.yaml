@@ -1,4 +1,4 @@
-#ansible-playbook -i localhost, -e instances=['mongodb','catalogue','redis','user','cart','mysql''shipping','rabbitmq','payment','frontend'] roboshop.yaml
+#ansible-playbook -i localhost, -e 'instances=["mongodb","catalogue","redis","user","cart","mysql","shipping","rabbitmq","payment","frontend"]' roboshop.yaml
 - name: roboshop
   hosts: all
   connection: local
@@ -22,6 +22,7 @@
         instance_type: t3.micro
         security_group: "{{ sg_id }}"
         image_id: "{{ ami_id }}"
+        wait: false
         tags:
           Project: roboshop
           Component: "{{ item }}"
@@ -60,6 +61,7 @@
         ttl: 1
         value: "{{ item.instances[0].public_ip_address }}"
         wait: true
+        overwite: true
       loop: "{{ ec2_output.results }}" #list 
       when: action == "create" and item.item == "frontend"
 

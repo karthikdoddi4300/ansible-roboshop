@@ -61,7 +61,7 @@
   
   - name: installing the mongodb
     ansible.builtin.dnf:
-      name: mongod-mongosh
+      name: mongodb-mongosh
       state: present
   
   - name: check product is loaded
