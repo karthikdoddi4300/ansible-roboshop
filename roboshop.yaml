@@ -1,3 +1,4 @@
+#ansible-playbook -i localhost, -e instances=['mongodb','catalogue','redis','user','cart','mysql''shipping','rabbitmq','payment','frontend'] roboshop.yaml
 - name: roboshop
   hosts: all
   connection: local
@@ -13,10 +14,8 @@
       - catalogue
 
   tasks:
-
-    ######################################################################
     # CREATE EC2 INSTANCES 
-    ######################################################################
+    
     - name: Create AWS EC2 instances
       amazon.aws.ec2_instance:
         name: "{{ item }}-{{ env }}"
@@ -37,9 +36,9 @@
         var: ec2_output
       when: action == "create"
 
-    ######################################################################
+    
     # CREATE ROUTE53 RECORDS
-    ######################################################################
+   
     - name: Create Route53 A record for private IP
       amazon.aws.route53:
         state: present
@@ -61,12 +60,12 @@
         ttl: 1
         value: "{{ item.instances[0].public_ip_address }}"
         wait: true
-      loop: "{{ ec2_output.results }}"
+      loop: "{{ ec2_output.results }}" #list 
       when: action == "create" and item.item == "frontend"
 
-    ######################################################################
+    
     # DESTROY SECTION
-    ######################################################################
+    
     - name: Delete Route53 records
       amazon.aws.route53:
         state: absent
@@ -81,6 +80,6 @@
       amazon.aws.ec2_instance:
         state: absent
         name: "{{ item }}-{{ env }}"
-        wait: false
+        wait: false # destroys very quickly 
       loop: "{{ instances }}"
       when: action == "destroy"
