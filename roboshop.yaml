@@ -61,7 +61,7 @@
         ttl: 1
         value: "{{ item.instances[0].public_ip_address }}"
         wait: true
-        overwite: true
+        overwrite: true
       loop: "{{ ec2_output.results }}" #list 
       when: item.item == "frontend" and action == "create" 
     
