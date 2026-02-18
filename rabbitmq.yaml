@@ -4,8 +4,8 @@
   tasks: 
   - name : copying the rabbitmq repo
     ansible.builtin.copy:
-    src: rabbitmq.service
-    dest: vim /etc/yum.repos.d/rabbitmq.repo
+      src: rabbitmq.service
+      dest: vim /etc/yum.repos.d/rabbitmq.repo
   
   - name: installing the rabbitmq
     ansible.builtin.dnf:
@@ -17,7 +17,7 @@
       name: rabbitmq-server
       state: started 
       enabled: yes
-      
+
   - name: create rabbitmq user
     community.rabbitmq.rabbitmq_user:
       user: roboshop 
