@@ -11,7 +11,7 @@
       name: nodejs
       state: present  
 
-  - name: 
+  - name: creating system user
     ansible.builtin.user:
       name: roboshop
       system: true
@@ -59,6 +59,7 @@
   - name: installing dependecies
     community.general.npm:
       path: /app
+
   - name: copying catalogue service
     ansible.builtin.copy:
       src: catalogue.service
@@ -85,6 +86,7 @@
   - name: load the products
     ansible.builtin.shell: mongosh --host "{{ MONGODB_HOST }}" </app/db/master-data.js
     when: catalogue_output.stdout  | int < 0 #  if stdout= -1 ,schema  is not present ,
+    
   - name: start catalogue
     ansible.builtin.service:
       name: catalogue
