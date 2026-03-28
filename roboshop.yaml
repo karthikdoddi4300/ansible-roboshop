@@ -8,7 +8,7 @@
     ami_id: ami-0220d79f3f480ecf5
     domain_name: hodophile.online
     env: dev
-    action: create
+    action: create # this is very important ,mind it 
     instances:
       - mongodb
       - catalogue
@@ -30,7 +30,7 @@
           Name: "{{ item }}-{{ env }}"
       loop: "{{ instances }}"
       register: ec2_output
-      when: action == "create"
+      when: action == "create" # action in variable defined above 
 
     - name: Print EC2 output
       ansible.builtin.debug:
